@@ -14,7 +14,7 @@ First setup a CMSSW environment. We only link against this so we only need the C
 
 Then clone this repo into a location of your chosing. It does not have to be under $(CMSSW_BASE)/src, in fact it is better that it is not. 
 ```
-cmsrel CMSSW_10_6_1
+scram project CMSSW_10_6_1
 git clone git@github.com:bmarzocc/EgRegresTrainerLegacy.git
 cd EgRegresTrainerLegacy 
 git checkout Run3_2021
@@ -24,6 +24,7 @@ source compile.sh
 ## run superCluster-training
 ```
 cd EgRegresTrainerLegacy 
+mkdir regressions
 source runSCRegTraining.sh
 ```
 
