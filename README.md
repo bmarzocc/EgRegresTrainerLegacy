@@ -22,8 +22,10 @@ source setup.sh
 source compile.sh
 ```
 ## run superCluster-training
+```
 cd EgRegresTrainerLegacy 
 source runSCRegTraining.sh
+```
 
 ## run resolution plotter
 Modify binning, input samples and variables to plot in: Plotter.C rootScripts/setupResPlotter.c packages/ResAnalysis/src/ResPlotter.cc
