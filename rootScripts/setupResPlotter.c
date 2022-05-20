@@ -7,6 +7,7 @@
    std::vector<double> etaBins = {0,0.5,1.0,1.4442,1.566,2.0,2.5};
    //std::vector<double> ptOneBinLow = {1,500}; 
    std::vector<double> ptOneBinLow = {1,100}; 
+   std::vector<double> ptOneBinVeryLow = {1,100}; 
    std::vector<double> ptOneBinMedium = {500,1000}; 
    std::vector<double> ptOneBinHigh = {1000,1500}; 
    std::vector<double> ptOneBinUltra = {1500,3000}; 
@@ -18,6 +19,7 @@
    //std::vector<double> etBinsLow    = {4, 8, 12, 16, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90 ,100};
    std::vector<double> etBinsLow    = {1, 6, 12, 15, 20,25 ,30,35,40, 45, 50, 60, 70, 80, 90 ,100};
    std::vector<double> etBinsAll    = {1,100};
+   std::vector<double> etBinsVeryLow    = {1,10,40,60,80,100};
    std::vector<double> etBinsMedium = {500,600,700,800,900,1000};
    std::vector<double> etBinsHigh   = {1000,1100,1200,1300,1400,1500};
    std::vector<double> etBinsUltra  = {1500,1750,2000,2250,2500,2750,3000};

@@ -38,7 +38,6 @@ void Plotter()
 //		ELE,
 //		PHO,
 		SC,
-//              DeepSC,
 //		ELE_500To1000,
 //		ELE_1000To1500,
 //		ELE_1500To3000,
@@ -54,12 +53,12 @@ void Plotter()
 
 	// list of variables to plot
 	vector<PlotVariable> plotVar = {
-		ETA,
+//		ETA,
 //		PU_EB,
 //		PU_EE,
 		ET_EB,
 		ET_EE,
-		ET_ETA
+//		ET_ETA
 	};
 	int nVariables = plotVar.size();
 
@@ -71,6 +70,7 @@ void Plotter()
 			plot("CRUIJF",plotVar.at(j),plotObj.at(i));
                         std::cout << "Run QUANTILES..." << std::endl; 
      			plot("QUANTILES",plotVar.at(j),plotObj.at(i));
+
 		}
 	}
 }
@@ -107,10 +107,10 @@ void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj)
 	// Object settings
 	if(plotObj == ELE){
 		treeName1 = "treeEleStep4";
-		baseCuts += " && ele.et>0";	
+		baseCuts += " && evt.eventnr%5>2 && ele.et>0";	
 		etBinning = "etBinsLow";
 		oneBinRange = "ptOneBinLow";
-		saveLoc = "/Electrons/Ele";
+		saveLoc = "/Ele";
 		fitsArg = "0,1";
 		etaBinning = "etaBins";
 		puBinning = "puBins";
@@ -132,16 +132,6 @@ void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj)
 		oneBinRange = "ptOneBinLow";
 		saveLoc = "/Superclusters/SC";
 		fitsArg = "0,1";
-		etaBinning = "etaBins";
-		puBinning = "puBins";
-	}
-        else if(plotObj == DeepSC){
-		treeName1 = "treeDeepStep3";
-		baseCuts += " && sc.et>0";	
-		etBinning = "etBinsLow";
-		oneBinRange = "ptOneBinLow";
-		saveLoc = "/Superclusters/Deep";
-		fitsArg = "0,3";
 		etaBinning = "etaBins";
 		puBinning = "puBins";
 	}
