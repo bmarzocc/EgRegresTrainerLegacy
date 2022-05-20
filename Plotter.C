@@ -54,21 +54,21 @@ void Plotter()
 
 	// list of variables to plot
 	vector<PlotVariable> plotVar = {
-//		ETA,
+		ETA,
 //		PU_EB,
 //		PU_EE,
 		ET_EB,
 		ET_EE,
-//		ET_ETA
+		ET_ETA
 	};
 	int nVariables = plotVar.size();
 
 	for(int i=0;i<nObjects;i++){
 		for(int j=0;j<nVariables;j++){
                         std::cout << "Run DCB fits..." << std::endl;
-			//plot("DCB",plotVar.at(j),plotObj.at(i));
+			plot("DCB",plotVar.at(j),plotObj.at(i));
                         std::cout << "Run CRUIJFF fits..." << std::endl; 
-			//plot("CRUIJF",plotVar.at(j),plotObj.at(i));
+			plot("CRUIJF",plotVar.at(j),plotObj.at(i));
                         std::cout << "Run QUANTILES..." << std::endl; 
      			plot("QUANTILES",plotVar.at(j),plotObj.at(i));
 		}
