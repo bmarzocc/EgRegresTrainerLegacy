@@ -15,7 +15,7 @@ First setup a CMSSW environment. We only link against this so we only need the C
 Then clone this repo into a location of your chosing. It does not have to be under $(CMSSW_BASE)/src, in fact it is better that it is not. 
 ```
 cmsrel CMSSW_10_6_1
-git clone git@github.com:cms-egamma/EgRegresTrainerLegacy.git
+git clone git@github.com:bmarzocc/EgRegresTrainerLegacy.git
 cd EgRegresTrainerLegacy 
 git checkout Run3_2021
 source setup.sh
@@ -32,6 +32,8 @@ Modify binning, input samples and variables to plot in: Plotter.C rootScripts/se
 ```
 cd EgRegresTrainerLegacy 
 mkdir plots
+mkdir plots/Run3
+mkdir plots/Run3/Superclusters
 root -l Plotter.C
 ```
 
