@@ -28,22 +28,29 @@ void ResPlotter::Config::setDefaults()
   normalise = true;
 
   binLabelPrecision = 3;
-  divideMeanBySigma = true;
+  divideMeanBySigma = false;
+  //ratioMin = 0.7;
+  //ratioMax = 1.1; 
+  ratioMin = 0.65;
+  ratioMax = 1.05;
 
   std::vector<std::pair<std::string,std::string> > varsTree1 = {
-    {"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","raw energy"},
-    {"(mean*invTar)","Run3 electron correction"},
-    {"(mean*invTar)","Run3 photon correction"},
-    {"(mean*invTar)","Run3 supercluster correction"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} Mustache"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} DeepSC"}
+    {"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
+    //{"(mean*invTar)","E_{Reg} / E_{Gen} Mustache"}
+    //{"(mean*invTar)","E_{Reg} / E_{Gen} DeepSC"}
   };
-
   std::vector<std::pair<std::string,std::string> > varsTree2 = {
-    {"sc.rawEnergy/mc.energy","raw energy, 102X"},
-    {"sc.corrEnergy/mc.energy","74X corr, 102X"},
-    {"ele.ecalEnergy/mc.energy","80X ecal, 102X"}, 
-    {"ele.energy/mc.energy","80X ecal-trk, 102X"},
-    {"pho.energy/mc.energy","80X pho, 102X"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} Mustache"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} DeepSC"}
+    //{"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
+    {"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
+    //{"(mean*invTar)","E_{Reg} / E_{Gen} Mustache"}
+    //{"(mean*invTar)","E_{Reg} / E_{Gen} DeepSC"}
   };
+  
   vars.clear();
   vars.push_back(varsTree1);
   vars.push_back(varsTree2);
@@ -76,9 +83,9 @@ void ResPlotter::VarNameData::autoFill()
 
 void ResPlotter::makeHists(std::vector<TTree*> trees,const std::string& label,const std::string& cuts,
 			   const std::string& vsVar1,const std::string& vsVar2,
-			   const std::vector<double>& vsVar1Bins,const std::vector<double>& vsVar2Bins)
+			   const std::vector<double>& vsVar1Bins,const std::vector<double>& vsVar2Bins,const std::string& fitType)
 {
-  
+
   if(trees.size()!=cfg_.vars.size()){
     LogErr<<" error trees size "<<trees.size()<<" does not equal vars size "<<cfg_.vars.size()<<std::endl;
     return;
@@ -95,7 +102,7 @@ void ResPlotter::makeHists(std::vector<TTree*> trees,const std::string& label,co
   for(size_t treeNr=0;treeNr<trees.size();treeNr++){
     if(trees[treeNr]==nullptr) continue;
 
-    auto treeHists = makeHists(trees[treeNr],cfg_.vars[treeNr],cuts);
+    auto treeHists = makeHists(trees[treeNr],cfg_.vars[treeNr],cuts,fitType);
     for(size_t vsVar1BinNr=0;vsVar1BinNr<histsVec_.size();vsVar1BinNr++){
       for(auto& treeHist : treeHists[vsVar1BinNr]){
 	histsVec_[vsVar1BinNr].emplace_back(std::move(treeHist));
@@ -109,13 +116,24 @@ void ResPlotter::makeHists(std::vector<TTree*> trees,const std::string& label,co
 
 std::vector<std::vector<std::pair<TH2*,std::string> > > 
 ResPlotter::makeHists(TTree* tree,const std::vector<std::pair<std::string,std::string> >& vars,
-		      const std::string& cuts)const			    
+		      const std::string& cuts,const std::string& fitType)const			    
 {
+
+  int nrResBins = cfg_.nrResBins;
+  float resMin = cfg_.resMin;
+  float resMax = cfg_.resMax;
+  if(fitType=="QUANTILES"){
+     nrResBins = 1000000;
+     //nrResBins = 100000;
+     resMin = 0.;
+     resMax = 100.;
+     //resMax = 3.;
+  }
 
   std::vector<std::vector<std::pair<TH2*,std::string> > > outHistsVec(vsVar1Bins_.size()-1);
   for(auto& hists : outHistsVec){
     for(const auto& var : vars){
-      TH2* hist = new TH2D("hist",(";"+vsVar2_.plotname).c_str(),vsVar2Bins_.size()-1,&vsVar2Bins_[0],cfg_.nrResBins,cfg_.resMin,cfg_.resMax);
+      TH2* hist = new TH2D("hist",(";"+vsVar2_.plotname).c_str(),vsVar2Bins_.size()-1,&vsVar2Bins_[0],nrResBins,resMin,resMax);
       hist->Sumw2();
       hist->SetDirectory(0);
       hists.push_back({hist,var.second});
@@ -126,6 +144,7 @@ ResPlotter::makeHists(TTree* tree,const std::vector<std::pair<std::string,std::s
   for(auto& var : vars){
     varStr+=":"+var.first;
   }
+  
   auto vsVar1BinNr = [this](float vsVar)->size_t{
     for(size_t binNr=0;binNr+1<vsVar1Bins_.size();binNr++){
       if(vsVar>=vsVar1Bins_[binNr] && vsVar<vsVar1Bins_[binNr+1]) return binNr;
@@ -152,7 +171,7 @@ void ResPlotter::printFits(const std::vector<int>& histNrs,const std::string& ba
     LogErr << "Error, number of selected histograms must be either 2 or 3, not "<<histNrs.size()<<std::endl;
     return;
   }
-  auto vsVar1Label = HistFuncs::makeLabel("",0.657016,0.30662,0.9098,0.374564);
+  auto vsVar1Label = HistFuncs::makeLabel("",0.657016,0.80662,0.9098,0.874564);
   auto idealLabel = HistFuncs::makeLabel(label_,0.159106,0.798303,0.41364,0.864361);
    
   for(size_t vsVar1BinNr=0;vsVar1BinNr<histsVec_.size();vsVar1BinNr++){
@@ -171,12 +190,18 @@ void ResPlotter::printFits(const std::vector<int>& histNrs,const std::string& ba
     std::ostringstream vsVar1LabelStr;
     vsVar1LabelStr <<vsVar1Bins_[vsVar1BinNr]<<" < "<<vsVar1_.plotname<<" < "<<vsVar1Bins_[vsVar1BinNr+1];
     if(!vsVar1_.unit.empty()) vsVar1LabelStr<<" "<<vsVar1_.unit<<std::endl;
-    vsVar1Label->SetLabel(vsVar1LabelStr.str().c_str());
+    //vsVar1Label->SetLabel(vsVar1LabelStr.str().c_str());
     
+    std::string energyLabel = "";
+    if (cfg_.vars[0][0].first.find(std::string("rawEnergy")) != std::string::npos && cfg_.vars[0][0].first.find(std::string("/mc.energy")) != std::string::npos) energyLabel = "_ErawOverEgen";
+    else if (cfg_.vars[0][0].first.find(std::string("rawEnergy")) != std::string::npos && cfg_.vars[0][0].first.find(std::string("/sim.energy")) != std::string::npos) energyLabel = "_ErawOverEsim";
+    else if (cfg_.vars[0][0].first.find(std::string("invTar")) != std::string::npos) energyLabel = "_EregOverEgen";
+
     std::string nameSuffix = vsVar1_.filename+"BinNr"+std::to_string(vsVar1BinNr)+"_"+vsVar1_.filename+""+AnaFuncs::convertToTTreeStr(vsVar1Bins_[vsVar1BinNr])+"To"+AnaFuncs::convertToTTreeStr(vsVar1Bins_[vsVar1BinNr+1]);
-    std::string outName = baseOutName+"_"+nameSuffix;
-    std::string outNameMean = baseOutName+"Mean_"+nameSuffix;
-    std::string outNameSigma = baseOutName+"Sigma_"+nameSuffix;
+    std::string outName = baseOutName+"_"+nameSuffix+energyLabel;
+    std::string outNameMean = baseOutName+"Mean_"+nameSuffix+energyLabel;
+    std::string outNameSigma = baseOutName+"Sigma_"+nameSuffix+energyLabel;
+    std::string outNameSigmaOverM = baseOutName+"SigmaOverM_"+nameSuffix+energyLabel;
     
     
     auto hists = histsVec_[vsVar1BinNr];
@@ -189,10 +214,16 @@ void ResPlotter::printFits(const std::vector<int>& histNrs,const std::string& ba
     }
   
     //now we plot the fit params vs the variable of interets
-    auto graphSigma = plotFitParamsVsVarComp(fitParams,ResFitter::ValType::Sigma,cfg_.divideMeanBySigma);
+
+    auto graphSigma = plotFitParamsVsVarComp(fitParams,ResFitter::ValType::Sigma,false);
     if(twoComp) formatTwoComp(graphSigma,vsVar1Label,idealLabel);
     else formatThreeComp(graphSigma,vsVar1Label,idealLabel);
     if(!baseOutName.empty()) HistFuncs::print(outNameSigma,"c1",true);
+
+    auto graphSigmaOverM = plotFitParamsVsVarComp(fitParams,ResFitter::ValType::Sigma,true);
+    if(twoComp) formatTwoComp(graphSigmaOverM,vsVar1Label,idealLabel);
+    else formatThreeComp(graphSigmaOverM,vsVar1Label,idealLabel);
+    if(!baseOutName.empty()) HistFuncs::print(outNameSigmaOverM,"c1",true);
     
     auto graphMean = plotFitParamsVsVarComp(fitParams,ResFitter::ValType::Mean);
     if(twoComp) formatTwoComp(graphMean,vsVar1Label,idealLabel,true);
@@ -246,8 +277,13 @@ void ResPlotter::printResComps(const std::vector<ResFitter::ParamsVsVar>& fitPar
     HistFuncs::XYCoord(0.150334,0.254355,0.471047,0.440767).setNDC(leg);
     leg->Draw();
 
+    std::string energyLabel = "";
+    if (cfg_.vars[0][0].first.find(std::string("rawEnergy")) != std::string::npos && cfg_.vars[0][0].first.find(std::string("/mc.energy")) != std::string::npos) energyLabel = "_ErawOverEgen";
+    else if (cfg_.vars[0][0].first.find(std::string("rawEnergy")) != std::string::npos && cfg_.vars[0][0].first.find(std::string("/sim.energy")) != std::string::npos) energyLabel = "_ErawOverEsim";
+    else if (cfg_.vars[0][0].first.find(std::string("invTar")) != std::string::npos) energyLabel = "_EregOverEgen";
+
     std::string histName = baseName+"_binNr"+std::to_string(binNr)+"_"+vsVar2_.filename+
-      AnaFuncs::convertToTTreeStr(binMin)+"To"+AnaFuncs::convertToTTreeStr(binMax);
+      AnaFuncs::convertToTTreeStr(binMin)+"To"+AnaFuncs::convertToTTreeStr(binMax)+energyLabel;
     HistFuncs::print(histName,"c1",true);
   }
 }
@@ -374,9 +410,13 @@ void ResPlotter::formatTwoComp(TGraph* graph,TPaveLabel* vsVar1Label,TPaveLabel*
   if(isMean) topGraph->GetYaxis()->SetRangeUser(0.9,1.05);
   topGraph->SetTitle("");
   auto leg = HistFuncs::getFromCanvas<TLegend>(pads[0],"TLegend")[0];
-  leg->SetTextSize(0.0440388);
-  //      HistFuncs::XYCoord(0.644766,0.155052,0.997773,0.301394).setNDC(leg);
-  HistFuncs::XYCoord(0.57386,0.155137,0.927253,0.301265).setNDC(leg);
+  //leg->SetTextSize(0.0440388);
+  leg->SetTextSize(0.0540388);
+ 
+  //HistFuncs::XYCoord(0.644766,0.155052,0.997773,0.301394).setNDC(leg);
+  if(isMean) HistFuncs::XYCoord(0.557016,0.155137,0.927253,0.301265).setNDC(leg);
+  else HistFuncs::XYCoord(0.557016,0.655137,0.927253,0.801265).setNDC(leg);
+
   leg->SetFillStyle(0);
   leg->Draw();
   vsVar1Label->Draw();
@@ -385,7 +425,7 @@ void ResPlotter::formatTwoComp(TGraph* graph,TPaveLabel* vsVar1Label,TPaveLabel*
   graph->SetTitle((";"+vsVar2_.axisLabel()).c_str());
   graph->GetXaxis()->SetRangeUser(0,vsVar2Max);
   graph->SetMarkerStyle(8);
-  graph->GetYaxis()->SetRangeUser(0.8,1.1);
+  graph->GetYaxis()->SetRangeUser(cfg_.ratioMin,cfg_.ratioMax);
 }
 
 void ResPlotter::formatThreeComp(TGraph* graph,TPaveLabel* vsVar1Label,TPaveLabel* infoLabel,bool isMean)const 

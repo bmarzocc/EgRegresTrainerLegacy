@@ -127,7 +127,7 @@ Regression.1.FixMean: {args.fix_mean}
 
 	# Scram arch has to be set manually
 	# This also must be done in the training script in scripts/
-	arch = "slc7_amd64_gcc700"
+	arch = "slc7_amd64_gcc820"
 
         print "starting: {}".format(self.name())
         subprocess.Popen(["bin/"+arch+"/RegressionTrainerExe",self.cfg_name()]).communicate()

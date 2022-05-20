@@ -1,0 +1,13 @@
+#!/bin/bash
+
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache.root --output_dir results_Ele_Mustache
+
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA.root --output_dir results_Ele_DeepSC_AlgoA
+ 
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoB.root --output_dir results_Ele_DeepSC_AlgoB
+
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache.root --output_dir results_Pho_Mustache
+
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA.root --output_dir results_Pho_DeepSC_AlgoA
+ 
+python scripts/runSCRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoB.root --output_dir results_Pho_DeepSC_AlgoB

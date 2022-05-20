@@ -676,6 +676,7 @@ void HistFuncs::print(const std::string& fileName,const std::string& canvasName,
     canvas->Print(outputNameGif.c_str());
     canvas->Print(outputNamePdf.c_str());
   }
+  canvas->Print(outputNamePdf.c_str());
   canvas->Print(outputNamePng.c_str());
   canvas->Print(outputNameC.c_str());
 }

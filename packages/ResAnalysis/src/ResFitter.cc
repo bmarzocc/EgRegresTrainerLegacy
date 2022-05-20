@@ -18,12 +18,26 @@
 #include "TH2.h"
 #include "TGraphErrors.h"
 
+std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> positions)const
+{
+  int nq = positions.size(); // number of quantiles to compute
+  double xq[nq];  // position where to compute the quantiles in [0,1]
+  double yq[nq];  // array to contain the quantiles
+  for (int i=0;i<nq;i++) xq[i] = positions.at(i);
+  hist->GetQuantiles(nq,yq,xq); 
+
+  std::vector<double> quantiles;
+  for (int i=0;i<nq;i++) quantiles.push_back(yq[i]);
+  return quantiles;
+}
+
 ResFitter::Param ResFitter::makeFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName)const
 {
   switch(fitType_){
   case FitType::CB: return makeCBFit(hist,xmin,xmax,fitVarName);
   case FitType::DCB: return makeDCBFit(hist,xmin,xmax,fitVarName);
   case FitType::Cruijff: return makeCruijffFit(hist,xmin,xmax,fitVarName);
+  case FitType::Quantiles: return makeQuantilesFit(hist,xmin,xmax,fitVarName); 
   }
   
   return ResFitter::Param();
@@ -160,6 +174,37 @@ ResFitter::Param ResFitter::makeCruijffFit(TH1* hist,float xmin,float xmax,const
   return fitParam;
 }
 
+ResFitter::Param ResFitter::makeQuantilesFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName)const
+{
+  RooRealVar  res("res","E^{reco}/E^{gen}", xmin,xmax,"");
+  res.setBins(10000,"cache") ;
+  res.setMin("cache",xmin) ;
+  res.setMax("cache",xmax) ;
+
+  RooRealVar  quantSigma("#sigma_{quant}","Quant Width", 1.5, 0., 10.,"");
+  RooRealVar mean( "#DeltaE", "mean_{quant}", 1. ,0.,5.,"");
+  RooDataHist data("res","E^{reco}/E^{gen}",res,hist);
+
+  std::vector<double> quantiles = computeQuantiles(hist, std::vector<double>({0.16,0.84}));
+  quantSigma.setVal((quantiles[1]-quantiles[0])/2.);
+  quantSigma.setError(1.e-10);
+
+  mean.setVal(hist->GetMean());
+  mean.setError(1.e-10);
+   
+  RooAddPdf model("model", "model");
+  RooPlot* plot = res.frame(RooFit::Range(xmin,xmax),RooFit::Bins(100));
+
+  data.plotOn(plot,RooFit::MarkerSize(1.0));
+  model.plotOn(plot); 
+  model.paramOn(plot,RooFit::Format("NEU", RooFit::AutoPrecision(2)),RooFit::ShowConstants(true),RooFit::Layout(0.6,0.95,0.8));
+
+  ResFitter::Param fitParam;
+  fitParam.fill(mean,quantSigma,FitType::Quantiles,plot,fitVarName);
+  return fitParam;
+}
+
+
 ResFitter::ParamsVsVar ResFitter::makeFitVsVar(TH2* hist2D,float fitMin,float fitMax,const std::string& fitVarName)const
 {
   std::vector<Param> fitParams;
@@ -237,17 +282,23 @@ TGraph* ResFitter::ParamsVsVar::makeGraph(ValType valType,bool divideSigmaByMean
     switch(valType){
     case ValType::Mean:
       yVal = {fitParam.scale,fitParam.scaleErr};
-      yAxisTitle = fitType!=FitType::Cruijff ? "CB mean" : "Cruijff mean";
+      yAxisTitle = "";
+      if(fitType==FitType::DCB)  yAxisTitle="CB mean";
+      else if(fitType==FitType::Cruijff)  yAxisTitle="Cruijff mean";
+      else if(fitType==FitType::Quantiles)  yAxisTitle="Quantile mean";
       break;
     case ValType::Sigma:
-      if (fitType!=FitType::Cruijff){
+      if (fitType==FitType::DCB){
 	yVal = {fitParam.sigma,fitParam.sigmaErr};
 	yAxisTitle = "CB #sigma";
-      }else{
+      }else if(fitType==FitType::Cruijff){
 	auto sqrtOfSqSum = [](float x,float y){return std::sqrt(x*x+y*y);};
 	yVal = {(fitParam.sigmaL+fitParam.sigmaR)/2.,sqrtOfSqSum(fitParam.sigmaLErr,fitParam.sigmaRErr)/2.};
 	yAxisTitle = "Cruijff #sigma_{ave}";
-      }
+      }else if (fitType==FitType::Quantiles){
+	yVal = {fitParam.sigma,fitParam.sigmaErr};
+	yAxisTitle = "Quantile #sigma";
+      } 
       break;
     case ValType::SigmaL:
       yVal = {fitParam.sigmaL,fitParam.sigmaLErr};

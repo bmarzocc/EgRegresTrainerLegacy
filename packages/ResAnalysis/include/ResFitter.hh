@@ -11,7 +11,7 @@ class TGraph;
 
 class ResFitter { 
 public:
-  enum class FitType{CB,Cruijff,DCB};
+  enum class FitType{CB,Cruijff,DCB,Quantiles};
   enum class ValType{Mean,Sigma,SigmaL,SigmaR};
   
   struct Param {
@@ -92,7 +92,9 @@ public:
   Param makeCBFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName="")const;
   Param makeDCBFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName="")const;
   Param makeCruijffFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName="")const;
+  Param makeQuantilesFit(TH1* hist,float xmin,float xmax,const std::string& fitVarName="")const;
   ParamsVsVar makeFitVsVar(TH2* hist2D,float fitMin,float fitMax,const std::string& fitVarName="")const;
+  std::vector<double> computeQuantiles(TH1* hist, std::vector<double> positions)const;
 
   void setFitType(FitType fitType){fitType_ = fitType;}
   void setFixDCB(bool fixMeanDCB,bool fixAlphaDCB){

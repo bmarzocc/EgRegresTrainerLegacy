@@ -67,7 +67,9 @@ public:
 
     //plotting options
     int binLabelPrecision;
-    bool divideMeanBySigma;    
+    bool divideMeanBySigma; 
+    float ratioMin;  
+    float ratioMax;     
 
     //the resolution variables to plot for each tree
     //first vector is indexed to trees, the payload is the variables to plot for that tree
@@ -124,7 +126,7 @@ public:
 
   //size of trees must equal size of cfg_.vars (this is enforced), however you can put a nullptr into skip that
   //entry eg {tree,nullptr} will skip cfg_vars[1] entry
-  void makeHists(std::vector<TTree*> trees,const std::string& label,const std::string& cuts,const std::string& vsVar1,const std::string& vsVar2,const std::vector<double>& vsVar1Bins,const std::vector<double>& vsVar2Bins);
+  void makeHists(std::vector<TTree*> trees,const std::string& label,const std::string& cuts,const std::string& vsVar1,const std::string& vsVar2,const std::vector<double>& vsVar1Bins,const std::vector<double>& vsVar2Bins,const std::string& fitType);
   void printFits(const std::vector<int>& histNrs,const std::string& baseOutName="")const;
   void printLabels()const{
     if(!histsVec_.empty()){
@@ -144,7 +146,7 @@ private:
   std::vector<std::vector<std::pair<TH2*,std::string> > >  
   makeHists(TTree* tree,
 	    const std::vector<std::pair<std::string,std::string> >& vars,
-	    const std::string& cuts)const;	    
+	    const std::string& cuts,const std::string& fitType)const;	    
 
   //prints all the plots comparing different resolutions for a given bin
   void printResComps(const std::vector<ResFitter::ParamsVsVar>& fitParams,

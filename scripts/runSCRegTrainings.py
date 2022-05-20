@@ -12,7 +12,7 @@ def main():
 
     parser = argparse.ArgumentParser(description='runs the SC regression trainings')
     parser.add_argument('--era',required=True,help='year to produce for, 2016, 2017, 2018 are the options')
-    parser.add_argument('--input_dir','-i',default='/home/hep/wrtabb/Egamma/input_trees/Run3_2021',help='input directory with the ntuples')
+    parser.add_argument('--input_dir','-i',default='/eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/',help='input directory with the ntuples')
     parser.add_argument('--output_dir','-o',default="results",help='output dir')
     args = parser.parse_args()
 
@@ -30,8 +30,10 @@ def main():
     #prefixes all the regressions produced
     if args.era=='2021Run3':
         base_reg_name = "2021Run3"
-	input_ideal_ic  = "{}/DoubleElectron_FlatPt-1To500_FlatPU0to70IDEALGT_120X_mcRun3_2021_realistic_v6_ECALIdealIC-v2_AODSIM.root".format(args.input_dir)
-        input_real_ic  = "{}/DoubleElectron_FlatPt-1To500_FlatPU0to70_120X_mcRun3_2021_realistic_v6-v1_AODSIM.root".format(args.input_dir)
+        realICs = args.input_dir
+	idealICs = (args.input_dir).replace('.root','_idealICs.root')
+        input_ideal_ic = idealICs
+        input_real_ic = realICs
         ideal_eventnr_cut = "evt.eventnr%5==0"
         real_eventnr_cut = "evt.eventnr%5==1"
 
@@ -44,7 +46,7 @@ def main():
     regArgs.input_testing = str(input_ideal_ic)
     regArgs.set_sc_default()
     regArgs.cfg_dir = "configs"
-    regArgs.out_dir = "regressions/Run3SC" 
+    regArgs.out_dir = "regressions/Run3SC_"+args.output_dir 
     regArgs.cuts_name = cuts_name
     regArgs.base_name = "{}_IdealIC_IdealTraining".format(base_reg_name)
     regArgs.cuts_base = base_ele_cuts.format(extra_cuts = ideal_eventnr_cut)
@@ -76,7 +78,7 @@ steps to be run:
     input_for_input_for_res_training = str(input_real_ic)
     
     # Set scram arch
-    arch = "slc7_amd64_gcc700"
+    arch = "slc7_amd64_gcc820"
     if run_step2: subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",input_for_input_for_res_training,input_for_res_training,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",regArgs.tree_name,"--writeFullTree","1","--regOutTag","Ideal"]).communicate()
 
     regArgs.base_name = "{}_RealIC_RealTraining".format(base_reg_name)

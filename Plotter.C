@@ -10,6 +10,7 @@ enum PlotObject{
 	ELE,
 	PHO,
 	SC,
+        DeepSC,
 	ELE_500To1000,
 	ELE_1000To1500,
 	ELE_1500To3000,
@@ -21,7 +22,7 @@ enum PlotObject{
 	ELE_ALL_ENERGY,
 	PHO_ALL_ENERGY
 };
-void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj);
+void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj);
 
 void Plotter()
 {
@@ -37,6 +38,7 @@ void Plotter()
 //		ELE,
 //		PHO,
 		SC,
+//              DeepSC,
 //		ELE_500To1000,
 //		ELE_1000To1500,
 //		ELE_1500To3000,
@@ -52,40 +54,54 @@ void Plotter()
 
 	// list of variables to plot
 	vector<PlotVariable> plotVar = {
-		ETA,
+//		ETA,
 //		PU_EB,
 //		PU_EE,
-//		ET_EB,
-//		ET_EE,
+		ET_EB,
+		ET_EE,
 //		ET_ETA
 	};
 	int nVariables = plotVar.size();
 
 	for(int i=0;i<nObjects;i++){
 		for(int j=0;j<nVariables;j++){
-			plot(false,plotVar.at(j),plotObj.at(i));
-			plot(true,plotVar.at(j),plotObj.at(i));
+                        std::cout << "Run DCB fits..." << std::endl;
+			//plot("DCB",plotVar.at(j),plotObj.at(i));
+                        std::cout << "Run CRUIJFF fits..." << std::endl; 
+			//plot("CRUIJF",plotVar.at(j),plotObj.at(i));
+                        std::cout << "Run QUANTILES..." << std::endl; 
+     			plot("QUANTILES",plotVar.at(j),plotObj.at(i));
 		}
 	}
 }
 
-void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj)
+void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj)
 {
 	TString var1,var2,binning1,binning2,saveTag;
 	TString fitType;
 
-	if(dcbFit){ 
+	if(fit=="DCB"){ 
 		gROOT->ProcessLine("res.setFitType(ResFitter::FitType::DCB)");
 		fitType = "DCB";
 	}
-	else{
+	if(fit=="CRUIJF"){ 
 		gROOT->ProcessLine("res.setFitType(ResFitter::FitType::Cruijff)");
 		fitType = "CRUIJF";
 	} 
+        if(fit=="QUANTILES"){ 
+		gROOT->ProcessLine("res.setFitType(ResFitter::FitType::Quantiles)");
+		fitType = "QUANTILES";
+	} 
 
-	TString baseCuts = "mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
-	TString treeName1;
-	TString treeName2 = "nullptr";
+	//TString baseCuts = "mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
+        //TString baseCuts = "sim.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
+        TString baseCuts = "sim.energy>0.";
+        TString treeName1 = "treeSCStep3";
+        //TString treeName1 = "treeDeepStep3A";
+	//TString treeName2 = "nullptr";
+        //TString treeName2 = "treeSCStep3";
+        TString treeName2 = "treeDeepStep3A";
+        //TString treeName2 = "treeDeepStep3B";
 	TString puBinning,etBinning,etaBinning,oneBinRange,saveLoc,fitsArg;
 
 	// Object settings
@@ -115,6 +131,16 @@ void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj)
 		etBinning = "etBinsLow";
 		oneBinRange = "ptOneBinLow";
 		saveLoc = "/Superclusters/SC";
+		fitsArg = "0,1";
+		etaBinning = "etaBins";
+		puBinning = "puBins";
+	}
+        else if(plotObj == DeepSC){
+		treeName1 = "treeDeepStep3";
+		baseCuts += " && sc.et>0";	
+		etBinning = "etBinsLow";
+		oneBinRange = "ptOneBinLow";
+		saveLoc = "/Superclusters/Deep";
 		fitsArg = "0,3";
 		etaBinning = "etaBins";
 		puBinning = "puBins";
@@ -241,7 +267,7 @@ void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj)
 		binning1 = oneBinRange;
 		var2 	 = "mc.pt";
 		binning2 = etBinning;
-		saveTag  = "PU_EE";
+		saveTag  = "ET_EB";
 		baseCuts += " && abs(sc.seedEta)<1.442";
 	}
 	else if(plotVar==ET_EE){
@@ -249,14 +275,14 @@ void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj)
 		binning1 = oneBinRange;
 		var2 	 = "mc.pt";
 		binning2 = etBinning;
-		saveTag  = "PU_EE";
+		saveTag  = "ET_EE";
 		baseCuts += " && abs(sc.seedEta)>1.566";
 	}
 	else if(plotVar==ET_ETA){
 		var1 	 = "sc.seedEta";
-		binning1 = "etaBins";
+		binning1 = etaBinning;
 		var2 	 = "mc.pt";
-		binning2 = "etBinsHEEle";
+		binning2 = etBinning;
 		saveTag  = "EtEta";
 	}
 	else{
@@ -265,7 +291,7 @@ void plot(bool dcbFit,PlotVariable plotVar,PlotObject plotObj)
 	}
 
 	TString printFits = "res.printFits({"+fitsArg+"},\"plots/Run3"+saveLoc+"_"+fitType+"_"+saveTag+"_\")";
-	TString makeHists = "res.makeHists({"+treeName1+","+treeName2+"},\"\",\""+baseCuts+"\",\""+var1+"\",\""+var2+"\","+binning1+","+binning2+")";
+	TString makeHists = "res.makeHists({"+treeName1+","+treeName2+"},\"\",\""+baseCuts+"\",\""+var1+"\",\""+var2+"\","+binning1+","+binning2+",\""+fitType+"\")";
 	gROOT->ProcessLine(makeHists);
 	gROOT->ProcessLine(printFits);
 
