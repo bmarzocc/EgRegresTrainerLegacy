@@ -10,7 +10,7 @@ class RegArgs:
         self.vars_name = "stdVar"  
         self.cfg_dir = "configs"
         self.out_dir = "results" 
-        self.tree_name = "egRegTree"
+        self.tree_name = "egRegTree_genMatched"
         self.write_full_tree = "0"
         self.min_events = 300
         self.shrinkage = 0.15

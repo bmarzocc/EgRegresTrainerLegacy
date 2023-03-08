@@ -25,14 +25,21 @@ def main():
     run_step2 = True
     run_step3 = True 
     run_step4 = True
-    run_step4_extra = False
+    #run_step4_extra = False
+    run_step4_extra = True
     
     base_ele_cuts = "(mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0 && ele.et>0 && {extra_cuts})"
 
+    era_name = '2021Run3'
     if args.tag=='2021Run3':
         tag_name = "2021Run3"
-        input_ideal_ic  = "{}/DoubleElectron_FlatPt-1To500_FlatPU0to70IDEALGT_120X_mcRun3_2021_realistic_v6_ECALIdealIC-v2_AODSIM.root".format(args.input_dir)
-        input_real_ic  = "{}/DoubleElectron_FlatPt-1To500_FlatPU0to70_120X_mcRun3_2021_realistic_v6-v1_AODSIM.root".format(args.input_dir)
+        realICs = args.input_dir
+        #idealICs = (args.input_dir).replace('125X_bugFix.root','idealICs_125X_bugFix.root')
+        idealICs = (args.input_dir).replace('.root','_idealICs.root')
+        print "realICs:",realICs
+        print "idealICs:",idealICs
+        input_ideal_ic = idealICs
+        input_real_ic = realICs
         ideal_eventnr_cut = "evt.eventnr%5==0"	# ~4 million electrons
         real_eventnr_cut = "evt.eventnr%5==1"	# ~4 million electrons
         ep_eventnr_cut = "evt.eventnr%5==2"	# ~4 million electrons
@@ -53,7 +60,7 @@ def main():
     regArgs.cuts_base = base_ele_cuts.format(extra_cuts = ideal_eventnr_cut)
     regArgs.cuts_name = "stdCuts"
     regArgs.cfg_dir = "configs"
-    regArgs.out_dir = "results/resultsEle_HigherCorrConstraint" 
+    regArgs.out_dir = "results/resultsEle_HigherCorrConstraint_"+args.output_dir  
     regArgs.ntrees = 1500  
     regArgs.base_name = "regEleEcal{era_name}_IdealIC_IdealTraining".format(era_name=era_name)
     if run_step1: regArgs.run_eb_and_ee()
@@ -69,7 +76,7 @@ def main():
     input_for_res_training = str(regArgs.applied_name()) #save the output name before we change it
 
     # Set scram arch
-    arch = "slc7_amd64_gcc700"
+    arch = "slc7_amd64_gcc820"
 
     if run_step2: subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",input_real_ic,input_for_res_training,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",regArgs.tree_name,"--writeFullTree","1","--regOutTag","Ideal"]).communicate()
     

@@ -18,7 +18,7 @@
 #include "TH2.h"
 #include "TGraphErrors.h"
 
-std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> positions)const
+/*std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> positions)const
 {
   int nq = positions.size(); // number of quantiles to compute
   double xq[nq];  // position where to compute the quantiles in [0,1]
@@ -28,6 +28,83 @@ std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> p
 
   std::vector<double> quantiles;
   for (int i=0;i<nq;i++) quantiles.push_back(yq[i]);
+  return quantiles;
+}*/
+
+/*std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> positions)const
+{
+  std::vector<double> quantiles;
+  positions.resize(2);
+  quantiles.resize(3);
+  double fraction = -1.;
+  int bin = -1;
+
+  TH1* hist_clone = (TH1*)hist->Clone();
+  hist_clone->Rebin(25);
+  double xMax = hist_clone->GetBinCenter(hist_clone->GetMaximumBin());
+  int binMax = hist->FindBin(xMax);
+  quantiles[0] = hist->GetBinCenter(binMax);
+  
+
+  //compute left quantile
+  bin = binMax;
+  double left_int = hist->Integral(1,binMax);
+  while(fraction<positions.at(0))
+  {
+     fraction =  hist->Integral(bin,binMax)/left_int;
+     bin--; 
+  } 
+  quantiles[1] = hist->GetBinCenter(bin);
+  
+  //compute right quantile
+  bin = binMax;
+  fraction = -1.;
+  double right_int = hist->Integral(binMax,hist->GetNbinsX());
+  while(fraction<positions.at(0))
+  {
+     fraction =  hist->Integral(binMax,bin)/right_int;
+     bin++; 
+  } 
+  quantiles[2] = hist->GetBinCenter(bin);
+ 
+  //std::cout << "Quantiles: " << quantiles[1] << " - " << quantiles[2] << " - " << quantiles[0] << " - " << hist->GetMean() << std::endl;
+  return quantiles;
+}*/
+
+std::vector<double> ResFitter::computeQuantiles(TH1* hist, std::vector<double> positions)const
+{
+  std::vector<double> quantiles;
+  positions.resize(1);
+  quantiles.resize(3);
+  double fraction = -1.;
+  int binLeft = -1;
+  int binRight = -1;
+
+  TH1* hist_clone = (TH1*)hist->Clone();
+  hist_clone->Rebin(25);
+  double xMax = hist_clone->GetBinCenter(hist_clone->GetMaximumBin());
+  int binMax = hist->FindBin(xMax);
+  quantiles[0] = hist->GetBinCenter(binMax);
+  
+
+  //compute left quantile
+  binLeft = binMax+1;
+  binRight = binMax;
+  int count = 0;
+  double integral = hist->Integral();
+  while(fraction<positions.at(0))
+  {
+     fraction =  hist->Integral(binLeft,binRight)/integral;
+     //std::cout << "integral: " << binLeft << " - " << binRight << " - " << fraction << std::endl;
+     if(count%2==0) binRight++;
+     else  binLeft--;
+     
+     count++;
+  } 
+  quantiles[1] = hist->GetBinCenter(binLeft);
+  quantiles[2] = hist->GetBinCenter(binRight);
+  
+  //std::cout << "Quantiles: " << quantiles[1] << " - " << quantiles[2] << " - " << quantiles[0] << " - " << hist->GetMean() << std::endl;
   return quantiles;
 }
 
@@ -185,11 +262,21 @@ ResFitter::Param ResFitter::makeQuantilesFit(TH1* hist,float xmin,float xmax,con
   RooRealVar mean( "#DeltaE", "mean_{quant}", 1. ,0.,5.,"");
   RooDataHist data("res","E^{reco}/E^{gen}",res,hist);
 
-  std::vector<double> quantiles = computeQuantiles(hist, std::vector<double>({0.16,0.84}));
-  quantSigma.setVal((quantiles[1]-quantiles[0])/2.);
-  quantSigma.setError(1.e-10);
+  std::vector<double> quantiles;
+  if(hist->GetEntries()!=0)
+  {
+     //quantiles = computeQuantiles(hist, std::vector<double>({0.16,0.84}));
+     quantiles = computeQuantiles(hist, std::vector<double>({0.68}));
+     //quantSigma.setVal((quantiles[1]-quantiles[0])/2.);
+     quantSigma.setVal((quantiles[2]-quantiles[1])/2.);
+     quantSigma.setError(1.e-10);
+  }else{
+     quantSigma.setVal(0.);
+     quantSigma.setError(0.);
+  }
 
-  mean.setVal(hist->GetMean());
+  //mean.setVal(hist->GetMean());
+  mean.setVal(quantiles[0]);
   mean.setError(1.e-10);
    
   RooAddPdf model("model", "model");

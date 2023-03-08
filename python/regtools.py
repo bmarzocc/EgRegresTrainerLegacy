@@ -11,7 +11,7 @@ class RegArgs:
         self.vars_name = "stdVar"  
         self.cfg_dir = "configs"
         self.out_dir = "results" 
-        self.tree_name = "egRegTree"
+        self.tree_name = "egRegTree_genMatched"
         self.write_full_tree = "0"
         self.reg_out_tag = ""
         self.min_events = 300
@@ -153,3 +153,4 @@ Regression.1.FixMean: {args.fix_mean}
         forest_ee_file = self.output_name()
         self.do_eb = do_eb_org
         return forest_eb_file,forest_ee_file
+

@@ -1,8 +1,11 @@
 #!/bin/bash
 
-export PATH=$PATH:./bin/$SCRAM_ARCH
-export PYTHON27PATH=$PYTHON27PATH:python
-export PYTHONPATH=$PYTHONPATH:python
-export ROOT_INCLUDE_PATH=$ROOT_INCLUDE_PATH:$PWD/include
+#python scripts/runPhoRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA_125X_bugFix.root --output_dir DeepSC_AlgoA 
 
-python scripts/runPhoRegTrainings.py --era 2021Run3
+#python scripts/runPhoRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache_125X_bugFix.root --output_dir Mustache 
+
+python scripts/runPhoRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoB_125X_bugFix.root --output_dir DeepSC_AlgoB
+
+python scripts/runPhoRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoC_125X_bugFix.root --output_dir DeepSC_AlgoC
+
+python scripts/runPhoRegTrainings.py --era 2021Run3 --input_dir /eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoD_125X_bugFix.root --output_dir DeepSC_AlgoD 

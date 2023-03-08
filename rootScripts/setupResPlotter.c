@@ -1,6 +1,7 @@
  {
    //binning
-   std::vector<double> puBins = {0,10,20,30,40,50,60,70};
+   //std::vector<double> puBins = {0,10,20,30,40,50,60,70};
+   std::vector<double> puBins = {40,50,60,70,80,90,100};
    std::vector<double> resBins = {0.005, 0.0075, 0.01, 0.0125, 0.015, 0.0175, 0.02, 0.0225, 0.025, 0.0275, 0.03, 0.0325, 0.035, 0.0375, 0.04, 0.0425, 0.045, 0.0475, 0.05, 0.055, 0.06, 0.065, 0.07, 0.075, 0.08, 0.09, 0.1,0.12,0.2,0.4,0.5};
    std::vector<double> etaBins2p5 = {-2.5,-2.0,-1.5666,-1.4442,-1.0,-0.5,0.0,0.5,1.0,1.4442,1.566,2.0,2.5};//,2.75,3.0}
    std::vector<double> etaBins3 = {0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.4442,1.566,1.7,1.8,1.9,2.,2.25,2.5,2.75,3.0};
@@ -16,8 +17,8 @@
    std::vector<double> etaBinsFine = {0,0.2,0.4,0.6,0.8,1.0,1.2,1.4442,1.566,1.8,2.0,2.2,2.4,2.6};
    // binning for different energy ranges
    //std::vector<double> etBinsLow    = {1,100,200,300,400,500};
-   //std::vector<double> etBinsLow    = {4, 8, 12, 16, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90 ,100};
-   std::vector<double> etBinsLow    = {1, 6, 12, 15, 20,25 ,30,35,40, 45, 50, 60, 70, 80, 90 ,100};
+   std::vector<double> etBinsLow    = {4, 8, 12,16, 20,25 ,30,35,40, 45, 50, 60, 70, 80, 90 ,100};
+   //std::vector<double> etBinsLow    = {1, 6, 12, 15, 20,25 ,30,35,40, 45, 50, 60, 70, 80, 90 ,100};
    std::vector<double> etBinsAll    = {1,100};
    std::vector<double> etBinsVeryLow    = {1,10,40,60,80,100};
    std::vector<double> etBinsMedium = {500,600,700,800,900,1000};
@@ -58,59 +59,74 @@
    std::string resultsDirectory = "/eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/";
    std::string inputDirectory = "/eos/cms/store/group/dpg_ecal/alca_ecalcalib/bmarzocc/Clustering/";
 
-   // Run3_2021 Photons
-   std::string resultsPho = resultsDirectory + "resultsPho/";
+   // Run3_2021 Photons Mustache
+   std::string resultsPho = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_PhoRegression_Mustache_125X_bugFix/";
    std::string step3NamePho  = "regPhoEcal2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
-   TTree*treePhoStep3 = HistFuncs::makeChain("egRegTree",resultsPho+step3NamePho,1,1,1);
-   TTree*treePhoStep3Friend = HistFuncs::makeChain("egRegTreeFriend",resultsPho+step3NamePho,1,1,1);
+   TTree*treePhoStep3 = HistFuncs::makeChain("egRegTree_genMatched",resultsPho+step3NamePho,1,1,1);
+   TTree*treePhoStep3Friend = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsPho+step3NamePho,1,1,1);
    treePhoStep3->AddFriend(treePhoStep3Friend);
 
+   // Run3_2021 Photons DeepSC A
+   std::string resultsPhoDeepA = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_PhoRegression_DeepSC_AlgoA_125X_bugFix/";
+   std::string step3NamePhoDeepA  = "regPhoEcal2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
+   TTree*treePhoStep3DeepA = HistFuncs::makeChain("egRegTree_genMatched",resultsPhoDeepA+step3NamePhoDeepA,1,1,1);
+   TTree*treePhoStep3FriendDeepA = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsPhoDeepA+step3NamePhoDeepA,1,1,1);
+   treePhoStep3DeepA->AddFriend(treePhoStep3FriendDeepA);
+
    // Run3_2021 Mustache superclusters 
-   /*
-   std::string resultsSC = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_Mustache/";
-   //std::string resultsSC = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_Mustache/";
+   
+   std::string resultsSC = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_Mustache_125X_bugFix/";
+   //std::string resultsSC = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_Mustache_125X_bugFix/";
    std::string step3NameSC  = "2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
    std::string step2NameSC  = "2021Run3_RealIC_IdealTraining_stdVar_stdCuts_ntrees1500_applied.root";
-   TTree*treeSCStep3 = HistFuncs::makeChain("egRegTree",resultsSC+step2NameSC,1,1,1);
-   TTree*treeSCStep3Friend = HistFuncs::makeChain("egRegTreeFriend",resultsSC+step3NameSC,1,1,1);
+   TTree*treeSCStep3 = HistFuncs::makeChain("egRegTree_genMatched",resultsSC+step2NameSC,1,1,1);
+   TTree*treeSCStep3Friend = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsSC+step3NameSC,1,1,1);
    treeSCStep3->AddFriend(treeSCStep3Friend);
-   */
-   std::string step2NameSC  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache_SimMatched.root";
-   //std::string step2NameSC  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache.root";
+   
+   //std::string step2NameSC  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache_v2.root";
+   //std::string step2NameSC  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache_125X_bugFix.root";
    //std::string step2NameSC  = "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_Mustache.root";
-   TTree*treeSCStep3 = HistFuncs::makeChain("egRegTree",resultsDirectory+step2NameSC,1,1,1);
+   //TTree*treeSCStep3 = HistFuncs::makeChain("egRegTree_caloMatched",resultsDirectory+step2NameSC,1,1,1);
 
    // Run3_2021 DeepSC_algoA superclusters 
-   /*
-   std::string resultsDeepA = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoA/";
-   //std::string resultsDeepA = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoA/";
+   
+   std::string resultsDeepA = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoA_125X_bugFix/";
+   //std::string resultsDeepA = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoA_125X_bugFix/";
    std::string step3NameDeepA  = "2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
    std::string step2NameDeepA  = "2021Run3_RealIC_IdealTraining_stdVar_stdCuts_ntrees1500_applied.root";
-   TTree*treeDeepStep3A = HistFuncs::makeChain("egRegTree",resultsDeepA+step2NameDeepA,1,1,1);
-   TTree*treeDeepStep3FriendA = HistFuncs::makeChain("egRegTreeFriend",resultsDeepA+step3NameDeepA,1,1,1);
+   TTree*treeDeepStep3A = HistFuncs::makeChain("egRegTree_genMatched",resultsDeepA+step2NameDeepA,1,1,1);
+   TTree*treeDeepStep3FriendA = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsDeepA+step3NameDeepA,1,1,1);
    treeDeepStep3A->AddFriend(treeDeepStep3FriendA);
-   */
-   std::string step2NameDeepA  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA_SimMatched.root"; 
-   //std::string step2NameDeepA  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA.root";
+   
+   //std::string step2NameDeepA  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA_v2.root"; 
+   //std::string step2NameDeepA  = "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA_125X_bugFix.root";
    //std::string step2NameDeepA  = "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_egmRegNtuples_DeepSC_AlgoA.root";
-   TTree*treeDeepStep3A = HistFuncs::makeChain("egRegTree",resultsDirectory+step2NameDeepA,1,1,1);
+   //TTree*treeDeepStep3A = HistFuncs::makeChain("egRegTree_caloMatched",resultsDirectory+step2NameDeepA,1,1,1);
 
    // Run3_2021 DeepSC_algoB superclusters 
-   std::string resultsDeepB = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoB/";
-   //std::string resultsDeepB = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoB/";
+   std::string resultsDeepB = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoB_125X_bugFix/";
+   //std::string resultsDeepB = resultsDirectory + "FourGammasGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_SCRegression_DeepSC_AlgoB_125X_bugFix/";
    std::string step3NameDeepB  = "2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
    std::string step2NameDeepB  = "2021Run3_RealIC_IdealTraining_stdVar_stdCuts_ntrees1500_applied.root";
-   TTree*treeDeepStep3B = HistFuncs::makeChain("egRegTree",resultsDeepB+step2NameDeepB,1,1,1);
-   TTree*treeDeepStep3FriendB = HistFuncs::makeChain("egRegTreeFriend",resultsDeepB+step3NameDeepB,1,1,1);
+   TTree*treeDeepStep3B = HistFuncs::makeChain("egRegTree_genMatched",resultsDeepB+step2NameDeepB,1,1,1);
+   TTree*treeDeepStep3FriendB = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsDeepB+step3NameDeepB,1,1,1);
    treeDeepStep3B->AddFriend(treeDeepStep3FriendB);
 
-   // Run3_2021 Electrons 
-   std::string resultsEle = resultsDirectory + "resultsEle/";
+   // Run3_2021 Electrons Mustache
+   std::string resultsEle = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_EleRegression_Mustache_125X_bugFix/";
    std::string step3NameEle  = "regEleEcal2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
    std::string step4NameEle  = "regEleEcalTrk2021Run3_RealIC_stdVar_stdCuts_ntrees1500_applied.root";
-   TTree*treeEleStep4 = HistFuncs::makeChain("egRegTree",resultsEle+step3NameEle,1,1,1);
-   TTree*treeEleStep4Friend = HistFuncs::makeChain("egRegTreeFriend",resultsEle+step4NameEle,1,1,1);
+   TTree*treeEleStep4 = HistFuncs::makeChain("egRegTree_genMatched",resultsEle+step3NameEle,1,1,1);
+   TTree*treeEleStep4Friend = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsEle+step4NameEle,1,1,1);
    treeEleStep4->AddFriend(treeEleStep4Friend);
+
+   // Run3_2021 Electrons DeepSCA
+   std::string resultsEleDeepA = resultsDirectory + "FourElectronsGunPt1-100_pythia8_StdMixing_Flat55To75_14TeV_123X_mcRun3_2021_realistic_v11_UL18_pfRechitThres_EleRegression_DeepSC_AlgoA_125X_bugFix/";;
+   std::string step3NameEleDeepA  = "regEleEcal2021Run3_RealIC_RealTraining_stdVar_stdCuts_ntrees1500_applied.root";
+   std::string step4NameEleDeepA  = "regEleEcalTrk2021Run3_RealIC_stdVar_stdCuts_ntrees1500_applied.root";
+   TTree*treeEleStep4DeepA = HistFuncs::makeChain("egRegTree_genMatched",resultsEleDeepA+step3NameEleDeepA,1,1,1);
+   TTree*treeEleStep4FriendDeepA = HistFuncs::makeChain("egRegTree_genMatchedFriend",resultsEleDeepA+step4NameEleDeepA,1,1,1);
+   treeEleStep4DeepA->AddFriend(treeEleStep4FriendDeepA);
 
    // Run3_2021 High energy electrons
    std::string results500To1000Ele = resultsDirectory + "resultsPt500To1000Ele/";

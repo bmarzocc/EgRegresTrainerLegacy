@@ -37,18 +37,26 @@ void ResPlotter::Config::setDefaults()
   std::vector<std::pair<std::string,std::string> > varsTree1 = {
     //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} Mustache"}
     //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} DeepSC"}
-    {"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
-    //{"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
+    //{"(sc.rawEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
+    //{"(sc.rawEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
     //{"(mean*invTar)","E_{Reg} / E_{Gen} Mustache"}
     //{"(mean*invTar)","E_{Reg} / E_{Gen} DeepSC"}
+    //{"(ele.energy/mc.energy)","E_{Reg} / E_{Gen} Mustache"}
+    //{"(ele.energy/mc.energy)","E_{Reg} / E_{Gen} DeepSC"}
+    {"(pho.energy/mc.energy)","E_{Reg} / E_{Gen} Mustache"}
+    //{"(pho.energy/mc.energy)","E_{Reg} / E_{Gen} DeepSC"}
   };
   std::vector<std::pair<std::string,std::string> > varsTree2 = {
     //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} Mustache"}
     //{"(sc.rawEnergy+sc.rawESEnergy)/mc.energy","E_{Raw} / E_{Gen} DeepSC"}
-    //{"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
-    {"(sc.rawEnergy+sc.rawESEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
+    //{"(sc.rawEnergy)/sim.energy","E_{Raw} / E_{Sim} Mustache"}
+    //{"(sc.rawEnergy)/sim.energy","E_{Raw} / E_{Sim}  DeepSC"}
     //{"(mean*invTar)","E_{Reg} / E_{Gen} Mustache"}
     //{"(mean*invTar)","E_{Reg} / E_{Gen} DeepSC"}
+    //{"(ele.energy/mc.energy)","E_{Reg} / E_{Gen} Mustache"}
+    //{"(ele.energy/mc.energy)","E_{Reg} / E_{Gen} DeepSC"}
+    //{"(pho.energy/mc.energy)","E_{Reg} / E_{Gen} Mustache"}
+    {"(pho.energy/mc.energy)","E_{Reg} / E_{Gen} DeepSC"}
   };
   
   vars.clear();

@@ -35,9 +35,9 @@ void Plotter()
 
 	// list of physics objects to plot
 	vector<PlotObject> plotObj = {
-//		ELE,
+		ELE,
 //		PHO,
-		SC,
+//		SC,
 //		ELE_500To1000,
 //		ELE_1000To1500,
 //		ELE_1500To3000,
@@ -65,11 +65,11 @@ void Plotter()
 	for(int i=0;i<nObjects;i++){
 		for(int j=0;j<nVariables;j++){
                         std::cout << "Run DCB fits..." << std::endl;
-			plot("DCB",plotVar.at(j),plotObj.at(i));
+			//plot("DCB",plotVar.at(j),plotObj.at(i));
                         std::cout << "Run CRUIJFF fits..." << std::endl; 
 			plot("CRUIJF",plotVar.at(j),plotObj.at(i));
                         std::cout << "Run QUANTILES..." << std::endl; 
-     			plot("QUANTILES",plotVar.at(j),plotObj.at(i));
+     			//plot("QUANTILES",plotVar.at(j),plotObj.at(i));
 
 		}
 	}
@@ -93,14 +93,16 @@ void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj)
 		fitType = "QUANTILES";
 	} 
 
-	//TString baseCuts = "mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
+	TString baseCuts = "mc.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
         //TString baseCuts = "sim.energy>0 && ssFrac.sigmaIEtaIEta>0 && ssFrac.sigmaIPhiIPhi>0";
-        TString baseCuts = "sim.energy>0.";
-        TString treeName1 = "treeSCStep3";
+        
+        //TString treeName1 = "treePhoStep3";
+        TString treeName1 = "treeEleStep4";
         //TString treeName1 = "treeDeepStep3A";
 	//TString treeName2 = "nullptr";
         //TString treeName2 = "treeSCStep3";
-        TString treeName2 = "treeDeepStep3A";
+        TString treeName2 = "treeEleStep4DeepA";
+        //TString treeName2 = "treePhoStep3DeepA";
         //TString treeName2 = "treeDeepStep3B";
 	TString puBinning,etBinning,etaBinning,oneBinRange,saveLoc,fitsArg;
 
@@ -121,7 +123,7 @@ void plot(std::string fit,PlotVariable plotVar,PlotObject plotObj)
 		etBinning = "etBinsLow";
 		oneBinRange = "ptOneBinLow";
 		saveLoc = "/Photons/Pho";
-		fitsArg = "0,2";
+		fitsArg = "0,1";
 		etaBinning = "etaBins";
 		puBinning = "puBins";
 	}

@@ -29,8 +29,10 @@ def main():
 
     if args.era=='2021Run3':
         era_name = "2021Run3"
-        input_ideal_ic  = "{}/DoublePhoton_FlatPt-5To500_FlatPU0to70IDEALGT_120X_mcRun3_2021_realistic_v6_ECALIdealIC-v2_AODSIM.root".format(args.input_dir)
-        input_real_ic = "{}/DoublePhoton_FlatPt-5To500_FlatPU0to70_120X_mcRun3_2021_realistic_v6-v1_AODSIM.root".format(args.input_dir)
+        realICs = args.input_dir
+        idealICs = (args.input_dir).replace('125X_bugFix.root','idealICs_125X_bugFix.root')
+        input_ideal_ic = idealICs
+        input_real_ic = realICs
         ideal_eventnr_cut = "evt.eventnr%5==0"
         real_eventnr_cut = "evt.eventnr%5==1"
 
@@ -47,7 +49,7 @@ def main():
     regArgs.cuts_name = "stdCuts"
     regArgs.cuts_base = base_pho_cuts.format(extra_cuts = ideal_eventnr_cut)
     regArgs.cfg_dir = "configs"
-    regArgs.out_dir = "results/resultsPho" 
+    regArgs.out_dir = "results/resultsPho_"+args.output_dir 
     regArgs.ntrees = 1500  
     regArgs.base_name = "regPhoEcal{era_name}_IdealIC_IdealTraining".format(era_name=era_name)
     if run_step1: regArgs.run_eb_and_ee()
@@ -63,7 +65,7 @@ def main():
     input_for_res_training = str(regArgs.applied_name()) #save the output name before we change it
 
     # Set scram arch
-    arch = "slc7_amd64_gcc700"
+    arch = "slc7_amd64_gcc820"
     if run_step2: subprocess.Popen(["bin/"+arch+"/RegressionApplierExe",input_real_ic,input_for_res_training,"--gbrForestFileEE",forest_ee_file,"--gbrForestFileEB",forest_eb_file,"--nrThreads","4","--treeName",regArgs.tree_name,"--writeFullTree","1","--regOutTag","Ideal"]).communicate()
     
     #step3 we now run over re-train with the REAL sample for the sigma, changing the target to have the correction applied 

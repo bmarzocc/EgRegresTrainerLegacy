@@ -31,7 +31,8 @@ def main():
     if args.era=='2021Run3':
         base_reg_name = "2021Run3"
         realICs = args.input_dir
-	idealICs = (args.input_dir).replace('.root','_idealICs.root')
+	#idealICs = (args.input_dir).replace('125X_bugFix.root','idealICs_125X_bugFix.root')
+        idealICs = (args.input_dir).replace('.root','_idealICs.root')
         input_ideal_ic = idealICs
         input_real_ic = realICs
         ideal_eventnr_cut = "evt.eventnr%5==0"

@@ -44,7 +44,7 @@ TMVAFactoryOptions: !V:!Silent:!Color:!DrawProgressBar
 OutputDirectory: {args.out_dir}
 Regression.1.Name: {name}
 Regression.1.InputFiles: {args.input_training}
-Regression.1.Tree: egRegTree
+Regression.1.Tree: egRegTree_genMatched
 Regression.1.Method: BDT
 Regression.1.trainingOptions: SplitMode=random:!V
 Regression.1.Options: MinEvents=300:Shrinkage=0.15:NTrees={args.ntrees}:MinSignificance=5.0:EventWeight=1
